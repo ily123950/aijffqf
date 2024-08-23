@@ -1,32 +1,26 @@
 -- Импортируем необходимые сервисы
 local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")  -- Для симуляции ввода
 
--- Функция для имитации нажатия клавиши Ctrl
-local function simulateCtrlPress()
-    keypress(17)  -- Имитируем нажатие клавиши Ctrl
-end
-
--- Функция для имитации отпускания клавиши Ctrl
-local function simulateCtrlRelease()
-    keyrelease(17)  -- Имитируем отпускание клавиши Ctrl
-end
-
--- Функция для обработки нажатия клавиши Shift
-local function onShiftPressed(input, gameProcessed)
-    if input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.RightShift then
-        simulateCtrlPress()
+-- Функции для симуляции нажатия и отпускания клавиши Ctrl
+local function simulateCtrl(press)
+    if press then
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.LeftControl, false, game)
+        print("Shift pressed")
+    else
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.LeftControl, false, game)
+        print("Shift released")
     end
 end
 
--- Функция для обработки отпускания клавиши Shift
-local function onShiftReleased(input, gameProcessed)
-    if input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.RightShift then
-        simulateCtrlRelease()
+-- Функции для обработки нажатия и отпускания клавиши Shift
+local function onShiftInput(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.Keyboard and 
+       (input.KeyCode == Enum.KeyCode.LeftShift or input.KeyCode == Enum.KeyCode.RightShift) then
+        simulateCtrl(input.UserInputState == Enum.UserInputState.Begin)
     end
 end
 
--- Подписываемся на событие нажатия клавиши
-UserInputService.InputBegan:Connect(onShiftPressed)
-
--- Подписываемся на событие отпускания клавиши
-UserInputService.InputEnded:Connect(onShiftReleased)
+-- Подписываемся на события нажатия и отпускания клавиши
+UserInputService.InputBegan:Connect(onShiftInput)
+UserInputService.InputEnded:Connect(onShiftInput)
