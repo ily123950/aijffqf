@@ -1,16 +1,11 @@
 -- Импортируем необходимые сервисы
 local UserInputService = game:GetService("UserInputService")
-local VirtualInputManager = game:GetService("VirtualInputManager")  -- Для симуляции ввода
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local StarterGui = game:GetService("StarterGui")  -- Для использования SetCore
 
 -- Функции для симуляции нажатия и отпускания клавиши Ctrl
 local function simulateCtrl(press)
-    if press then
-        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.LeftControl, false, game)
-        print("Shift pressed")
-    else
-        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.LeftControl, false, game)
-        print("Shift released")
-    end
+    VirtualInputManager:SendKeyEvent(press, Enum.KeyCode.LeftControl, false, game)
 end
 
 -- Функции для обработки нажатия и отпускания клавиши Shift
@@ -20,6 +15,13 @@ local function onShiftInput(input, gameProcessed)
         simulateCtrl(input.UserInputState == Enum.UserInputState.Begin)
     end
 end
+
+-- Отправка уведомления при запуске скрипта
+StarterGui:SetCore("SendNotification", {
+    Title = "Notification";
+    Text = "Key simulator is on";
+    Duration = 3;  -- Время отображения уведомления в секундах
+})
 
 -- Подписываемся на события нажатия и отпускания клавиши
 UserInputService.InputBegan:Connect(onShiftInput)
